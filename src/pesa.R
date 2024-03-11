@@ -58,7 +58,7 @@ all_pesa_data2 <- lapply(all_pesa_data,
                            return(x)
                          })
 
-FINAL_cap_data <- all_pesa_data2 %>% 
+FINAL_pesa_capital <- all_pesa_data2 %>% 
   flatten() %>%
   data.table::rbindlist(fill=T,idcol=TRUE) %>%
   mutate(date = str_extract(pattern='(200[0-9]|20[12][0-9]|2030)',date)) %>%
@@ -82,6 +82,3 @@ FINAL_cap_data <- all_pesa_data2 %>%
   ungroup()%>%
   group_by(period,planned_outrun,measure) %>%
   summarise(values = mean(values,na.rm=T))
-  
-ggplot(data=FINAL_cap_data)+
-  geom_line(aes(x=as.numeric(period),y=values,linetype=planned_outrun,col=measure))

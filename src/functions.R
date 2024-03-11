@@ -33,8 +33,13 @@ UnzipCSV <- function(files){
   unlink(temp)
   data}
 
-ReadExcelSheets <- function(filename, tibble = T) {
-  sheets <- readxl::excel_sheets(filename)
+ReadExcelSheets <- function(filename, sheet_names, tibble = T) {
+  #default args
+  if(missing(sheet_names)){
+    sheets <- readxl::excel_sheets(filename)
+  } else {
+    sheets <- sheet_names
+  }
   x <- lapply(sheets, function(X) readxl::read_excel(filename, sheet = X))
   if(!tibble) x <- lapply(x, as.data.frame)
   names(x) <- sheets
@@ -50,12 +55,11 @@ ReadODSSheets <- function(filename, tibble = T) {
 }
 
 #Download and read excel
-ReadExcel <- function(files){
+ReadExcel <- function(files,sheets){
   #creates temp file to read in the data
   temp <- tempfile()
   download.file(files,temp)
-  #This is needed because a zip file may have multiple files
-  data <- ReadExcelSheets(temp)
+  data <- ReadExcelSheets(filename = temp,sheet_names = sheets)
   #unlink the temp file, important to do
   unlink(temp)
   data}
@@ -70,3 +74,4 @@ ReadODS <- function(files){
   #unlink the temp file, important to do
   unlink(temp)
   data}
+
