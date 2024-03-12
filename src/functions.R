@@ -22,9 +22,10 @@ UnzipCSV <- function(files){
   download.file(files,temp,extdir=tempdir())
   #This is needed because a zip file may have multiple files
   file_names <- unzip(temp,list=T)$Name
+  files_names <- file_names[grepl('.csv',file_names)]
   data<- sapply(file_names,
                 function(x){
-                  da <- data.table::fread(unzip(temp,x,exdir=tempdir()))
+                  da <- data.table::fread(unzip(temp,x,exdir=tempdir()),encoding = "UTF-8")
                   #janitor to clean unruly names
                   names(da) <- names(da) %>% janitor::make_clean_names()  
                   return(da)
