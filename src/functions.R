@@ -19,16 +19,17 @@ GetLinks <- function(url_name,string){
 UnzipCSV <- function(files){
   #creates temp file to read in the data
   temp <- tempfile()
-  download.file(files,temp)
+  download.file(files,temp,extdir=tempdir())
   #This is needed because a zip file may have multiple files
   file_names <- unzip(temp,list=T)$Name
-  data<- lapply(file_names,
+  data<- sapply(file_names,
                 function(x){
-                  da <- data.table::fread(unzip(temp,x))
+                  da <- data.table::fread(unzip(temp,x,exdir=tempdir()))
                   #janitor to clean unruly names
                   names(da) <- names(da) %>% janitor::make_clean_names()  
                   return(da)
-                })
+                },
+                USE.NAMES = T)
   #unlink the temp file, important to do
   unlink(temp)
   data}
