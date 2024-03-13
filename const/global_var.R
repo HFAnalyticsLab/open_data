@@ -11,3 +11,4 @@ gp_url1 <- 'https://digital.nhs.uk/data-and-information/publications/statistical
 gp_url2 <- 'https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice/july-2021'
 gp_url3 <- 'https://digital.nhs.uk/data-and-information/publications/statistical/appointments-in-general-practice/january-2024'
 workforce_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/nhs-workforce-statistics'
+ae_url <- 'https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/'
