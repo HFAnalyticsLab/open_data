@@ -29,8 +29,7 @@ UnzipCSV <- function(files){
                   #janitor to clean unruly names
                   names(da) <- names(da) %>% janitor::make_clean_names()  
                   return(da)
-                },
-                USE.NAMES = T)
+                })
   #unlink the temp file, important to do
   unlink(temp)
   data}
