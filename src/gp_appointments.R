@@ -5,9 +5,10 @@ gp_files <- GetLinks(gp_url,'Daily|CCG_CSV')
 #read in data
 gp_data <- sapply(gp_files,
                    function(x){
-                     UnzipCSV(x)
+                     data <- UnzipCSV(x)
                    },
                    USE.NAMES = T) %>%
+  #like a pancake
   flatten()
 
 #Filter out coverage files
@@ -17,7 +18,13 @@ gp_data2 <-purrr::keep(gp_data, !str_detect(names(gp_data), 'COVERAGE'))
 FINAL_gp_data <- lapply(gp_data2,
                    function(x){
                      x %>%
-                       dplyr::rename(dplyr::any_of(c(ccg_code='sub_icb_location_code',appt_mode='appointment_mode',count = 'count_of_appointments',appt_date='appointment_date',appt_status = 'appointment_status',ccg_ons_code='sub_icb_location_ons_code'))) %>%
+                       dplyr::rename(dplyr::any_of(c(
+                         ccg_code='sub_icb_location_code',
+                         appt_mode='appointment_mode',
+                         count = 'count_of_appointments',
+                         appt_date='appointment_date',
+                         appt_status = 'appointment_status',
+                         ccg_ons_code='sub_icb_location_ons_code'))) %>%
                        dplyr::select(ccg_code,ccg_ons_code,appt_status,appt_date,hcp_type,appt_mode,count,time_between_book_and_appt) %>%
                        #different date formats, coerce into consistent one
                        dplyr::mutate(appt_date = zoo::as.yearmon(lubridate::parse_date_time(appt_date,orders=c('dmy'))),

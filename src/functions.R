@@ -1,6 +1,10 @@
 #functions for common usage
 
-#Functions
+#Function to clean files and remove nuks
+CleanFiles<-function(file,newfile){
+  writeLines(iconv(readLines(file,skipNul = TRUE)),
+             newfile)
+}
 
 #Gets links from any single url; string matches
 GetLinks <- function(url_name,string){
@@ -23,13 +27,19 @@ UnzipCSV <- function(files){
   #This is needed because a zip file may have multiple files
   file_names <- unzip(temp,list=T)$Name
   files_names <- file_names[grepl('.csv',file_names)]
-  data<- lapply(file_names,
+  data <- lapply(file_names,
                 function(x){
-                  da <- data.table::fread(unzip(temp,x,exdir=tempdir()),encoding = "UTF-8")
+                  dirty_data <- unzip(temp,x,exdir=tempdir())
+                  #this is really annoting, and possibly memory intensive, but
+                  # it's the only way i can think of to get rid of the embedded nul
+                  #issue in fread - windows doesn't support sed commands so ...
+                  CleanFiles(dirty_data,dirty_data)
+                  cleaned_data <- data.table::fread(dirty_data,encoding = "UTF-8")
                   #janitor to clean unruly names
-                  names(da) <- names(da) %>% janitor::make_clean_names()  
-                  return(da)
+                  names(cleaned_data) <- names(cleaned_data) %>% janitor::make_clean_names()  
+                  return(cleaned_data)
                 })
+  names(data) <- file_names
   #unlink the temp file, important to do
   unlink(temp)
   data}
