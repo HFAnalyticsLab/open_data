@@ -14,4 +14,5 @@ workforce_url <- 'https://digital.nhs.uk/data-and-information/publications/stati
 ae_url <- 'https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/'
 community_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/community-services-statistics-for-children-young-people-and-adults'
 op_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/hospital-outpatient-activity'
-
+apc_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/provisional-monthly-hospital-episode-statistics-for-admitted-patient-care-outpatient-and-accident-and-emergency-data'
+mh_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/mental-health-services-monthly-statistics'
