@@ -13,3 +13,5 @@ gp_url3 <- 'https://digital.nhs.uk/data-and-information/publications/statistical
 workforce_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/nhs-workforce-statistics'
 ae_url <- 'https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/'
 community_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/community-services-statistics-for-children-young-people-and-adults'
+op_url <- 'https://digital.nhs.uk/data-and-information/publications/statistical/hospital-outpatient-activity'
+
