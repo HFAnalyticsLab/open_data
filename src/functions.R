@@ -36,7 +36,8 @@ UnzipCSV <- function(files){
                   CleanFiles(dirty_data,dirty_data)
                   cleaned_data <- data.table::fread(dirty_data,encoding = "UTF-8")
                   #janitor to clean unruly names
-                  names(cleaned_data) <- names(cleaned_data) %>% janitor::make_clean_names()  
+                  names(cleaned_data) <- names(cleaned_data) %>% 
+                    janitor::make_clean_names()  
                   return(cleaned_data)
                 })
   names(data) <- file_names

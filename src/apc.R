@@ -2,16 +2,15 @@ apc_links <- GetLinks(apc_url,'rovisional-monthly-hospital-episode-statistics-fo
 apc_links2 <- GetLinks(paste0('https://digital.nhs.uk/',apc_links),'.csv')
 apc_links3 <- apc_links2[grepl(pattern='OPEN_DATA.csv|MDBP.csv',apc_links2)]
 
-apc_data <- lapply(apc_links3,
+apc_data <- lapply(apc_links3[1],
                function(x){
                  data <- data.table::fread(x)
                  return(data)
                }) %>%
   data.table::rbindlist()
 
-
 FINAL_apc_data <- apc_data %>%
-  mutate(date = 
+  mutate(period = 
            lubridate::my(CALENDAR_MONTH_END_DATE)) %>%
   select(!CALENDAR_MONTH_END_DATE) %>%
   janitor::clean_names()

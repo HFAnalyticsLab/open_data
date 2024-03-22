@@ -31,8 +31,8 @@ community_csv_files <- lapply(community_csv,
 #Merge the files together
 community_data <- c(community_zip_files,community_csv_files)
 #comm names change annoyingly, so this just unifies them into prexisting system
-comm_names <- c('date',
-                'organisation_level',
+comm_names <- c('period',
+                'trust_code',
                 'org_code',
                 'geo_code',
                 'org_name',
@@ -49,16 +49,17 @@ comm_names <- c('date',
 #flatten the data and apply logic then rbind; takes longer than should?
 FINAL_community_data <- lapply(community_data,
                function(x){
-                 x %>% 
-                   janitor::clean_names() %>% 
+                 names(x)[1] <- 'period'
+                 data <- x %>% 
+                   janitor::clean_names() %>%
                    select(!any_of('reporting_period_end')) %>%
-                   setNames(.,comm_names) %>%
-                   dplyr::mutate(date = as.character(date))
+                   #filter(dimension %in% c('CareContacts','Referrals','UniqueCareContacts')) %>%
+                   #filter(geo_code == 'Provider') %>%
+                   dplyr::mutate(period = lubridate::parse_date_time(period,order=c('%d%m%y','%y%m%d'))) %>%
+                   dplyr::select(any_of(c('period','org_code','organisation_code','measure_value','value','dimension')))
+                 names(data) <- c('period','org_code','count','dimension')
+                 return(data)
                  }) %>%
   data.table::rbindlist()
-
-test <- FINAL_community_data %>%
-  group_by(date,organisation_level,dimension,org_name,measure_desc) %>%
-  summarise(count = sum(as.numeric(count)))
 
 

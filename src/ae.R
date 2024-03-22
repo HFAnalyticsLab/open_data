@@ -17,4 +17,5 @@ ae_data <- lapply(ae_files,
 
 FINAL_ae_data <- ae_data %>%
   dplyr::filter(period != 'TOTAL' & period != '') %>%
-  dplyr::mutate(period = lubridate::my(substr(period,8,nchar(period))))
+  dplyr::mutate(period = lubridate::my(substr(period,8,nchar(period)))) %>%
+  rename(trust_code='org_code')

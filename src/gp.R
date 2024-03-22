@@ -37,4 +37,6 @@ FINAL_gp_data <- lapply(gp_data2,
   #Remove oddities: there will be roughly 1300 obs that will be taken out, but this is
   #nothing in the grand scheme of things. Less than 0.001% or something.
   dplyr::filter(count != 0 |
-                  is.na(appt_date) == F)
+                  is.na(appt_date) == F) %>%
+  dplyr::rename(period = 'appt_date')
+
