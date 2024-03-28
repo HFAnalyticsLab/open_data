@@ -1,4 +1,4 @@
-fyear,type,baseline_2018, activity_cum_growth_constant ,predicted_activity_constant,activity_cum_growth_changing,predicted_activity_constant,actual_values, baseline_budget ,cwa_constant, predicted_budget_constant ,, predicted_budget_changing 
+fyear,type,baseline_2018, activity_cum_growth_constant ,predicted_activity_constant,activity_cum_growth_changing,predicted_activity_constant,actual_values, baseline_budget ,cwa_constant, predicted_budget_constant ,cwa_changing, predicted_budget_changing 
 2018,ae_attendances,24826982, 100.00 ,24826982,100,24826982,24826982," 3,511,161,918 ",100," 3,511,161,918 ",100," 3,511,161,918 "
 2018,apc_spell_count_elective,20760699, 100.00 ,20760699,100,20760699,20760699," 10,363,552,520 ",100," 10,363,552,520 ",100," 10,363,552,520 "
 2018,apc_emergency,6437959, 100.00 ,6437959,100,6437959,6437959," 16,735,761,400 ",100," 16,735,761,400 ",100," 16,735,761,400 "
