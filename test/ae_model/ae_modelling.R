@@ -63,15 +63,30 @@ ae_model <- brms::brm(
   file = "ae_model"
 )
 
-ae_beta_1 <- ae_model %>%
-  marginaleffects::avg_comparisons(variables = "occupied_ratio") 
+ae_beta_1 <- marginaleffects::avg_slopes(ae_model) 
 
-ame_zi_1 <- ae_model %>% 
-  marginaleffects::predictions(newdata = marginaleffects::datagrid(covid_flag = unique,
-                                 occupied_beds = seq(0, 1, by = 0.1))) %>% 
-  marginaleffects::posterior_draws() %>% 
-  # Scale occupied_beds
-  mutate(occupied_beds = occupied_beds * 100)
+ame_zi_1 <- marginaleffects::predictions(ae_model, 
+                               newdata = marginaleffects::datagrid(
+                                 covid_flag = unique,
+                                 occupied_ratio = seq(0.5, 1, by = 0.1)))
+
+ame_zi_2 <- marginaleffects::posterior_draws(ame_zi_1)
+
+ggplot(ame_zi_2,
+       aes(x = occupied_ratio, y = draw, color = covid_flag, fill = covid_flag)) +
+  ggdist::stat_lineribbon(aes(fill_ramp = stat(level))) +
+  scale_y_continuous(labels = label_percent()) +
+  scale_fill_viridis_d(option = "plasma", end = 0.8) +
+  scale_color_viridis_d(option = "plasma", end = 0.8) +
+  ggdist::scale_fill_ramp_discrete(range = c(0.2, 0.7)) +
+  facet_wrap(vars(covid_flag), ncol = 3) +
+  labs(x = "A&G Occupied beds ratio",
+       y = "Predicted proportion of type 1 AE breaches",
+       fill = "Covid Flag", color = "Covid Flag",
+       fill_ramp = "Credible interval") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
 
 ## OLD MODELLING -----
 
