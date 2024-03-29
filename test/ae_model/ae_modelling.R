@@ -18,15 +18,15 @@ label_pp_tiny <- scales::label_number(accuracy = 0.01, scale = 100,
 FINAL_regression_data <- FINAL_ae_data %>%
   #need it quarterly to be able to join
   dplyr::mutate(quarter_date = zoo::as.yearqtr(date)) %>%
-  dplyr::ungroup()%>%
+  dplyr::ungroup() %>%
   dplyr::select(-c(period_year,period_month,code,date)) %>%
   dplyr::group_by(quarter_date,org_code)%>%
   #group by summarise
   dplyr::summarise(across(starts_with('remergency'), sum, .names = "{.col}"))  %>%
   dplyr::left_join(.,FINAL_night_bed_data,by=c('quarter_date','org_code')) %>%
   #create variables, covid_flag, time since covid, breaches, admit ratio and occupied
-  dplyr::mutate(time_since_covid = quarter_date - zoo::as.yearqtr(make_date(year=2020,month=3,day=1)),
-                covid_flag = case_when(
+  dplyr::mutate(time_since_covid = quarter_date - zoo::as.yearqtr(lubridate::make_date(year=2020,month=3,day=1)),
+                covid_flag = dplyr::case_when(
                   as.integer(time_since_covid) == 0 ~ 'covid',
                   as.integer(time_since_covid) < 0 ~ 'pre_covid',
                   as.integer(time_since_covid) > 0 ~ paste0(as.integer(time_since_covid),"_yrs_since_covid")
@@ -34,20 +34,20 @@ FINAL_regression_data <- FINAL_ae_data %>%
                 type_1_breaches = remergency_breaches_type_1/remergency_type_1,
                 type_1_admit_ratio = remergency_admissions_type_1/remergency_type_1,
                 #note, multiply by 100 to enable easier interpretation. this is so confusing!!!
-                occupied_ratio = 1*(occupied_general_acute_beds/general_acute_beds)) %>%
+                occupied_ratio = 100*(occupied_general_acute_beds/general_acute_beds)) %>%
   #remove nas: should i constrain this dataset more?
   tidyr::drop_na() %>%
   #remove small superflous places (500 seems a good limit?)
-  dplyr::filter(general_acute_beds >= 500)
+  dplyr::filter(general_acute_beds >= 250)
 
 #Model specification ----
 
 #formula for ae
 ae_formula <- brms::bf(
   # mu (mean) part
-  type_1_breaches ~  type_1_admit_ratio + occupied_ratio + covid_flag + (1 | org_code) ,
+  type_1_breaches ~  type_1_admit_ratio + occupied_ratio + covid_flag + (1|org_code),
   # phi (precision) part
-  phi ~  covid_flag + (1 | org_code) ,
+  phi ~  covid_flag + (1|org_code) ,
   # alpha (zero-inflation) part
   zoi ~ type_1_admit_ratio + occupied_ratio,
   coi ~ type_1_admit_ratio + occupied_ratio
@@ -74,7 +74,7 @@ ae_model <- brms::brm(
   init = 0,
   prior = priors,
   #q: is this depth enough? should i increase? no warning about convergence
-  #so am very happy so far
+  #so am sort of happy so far
   control = list(adapt_delta = 0.97,
                  max_treedepth = 12),
   chains = 4, 
@@ -86,8 +86,7 @@ ae_model <- brms::brm(
   #only handle 4 threads max? 4 chains x 1 threads is enough. someone buy me
   #a better computer and I can do this more effectively
   threads = brms::threading(1),
-  file = "ae_model2",
-  backend = "cmdstanr"
+  file = "ae_model2"
 )
 
 # Model outputs -----
