@@ -30,9 +30,6 @@ UnzipCSV <- function(files){
   data <- lapply(file_names,
                 function(x){
                   dirty_data <- unzip(temp,x,exdir=tempdir())
-                  #this is really annoting, and possibly memory intensive, but
-                  # it's the only way i can think of to get rid of the embedded nul
-                  #issue in fread - windows doesn't support sed commands so ...
                   CleanFiles(dirty_data,dirty_data)
                   cleaned_data <- data.table::fread(dirty_data,encoding = "UTF-8")
                   #janitor to clean unruly names
