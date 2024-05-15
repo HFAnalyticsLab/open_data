@@ -25,20 +25,20 @@ FINAL_ae_data_post17 <- ae_data_post17 %>%
     remergency_type_3 = rowSums(across(c(number_of_a_e_attendances_other_a_e_department,a_e_attendances_other_a_e_department)),na.rm=T),
     remergency_admissions_type_1 = emergency_admissions_via_a_e_type_1,
     remergency_admissions_type_2 = emergency_admissions_via_a_e_type_2,
-    remergency_admissions_type_3 = rowSums(across(c(other_emergency_admissions,emergency_admissions_via_a_e_other_a_e_department)),na.rm=T),
-    remergency_breaches_type_1 = rowSums(across(c(attendances_over_4hrs_type_1,number_of_attendances_over_4hrs_type_1)),na.rm=T),
-    remergency_breaches_type_2 = rowSums(across(c(attendances_over_4hrs_type_2,number_of_attendances_over_4hrs_type_2)),na.rm=T),
-    remergency_breaches_type_3 = rowSums(across(c(attendances_over_4hrs_other_department,number_of_attendances_over_4hrs_other_a_e_department)),na.rm=T),
+    remergency_admissions_type_3 = rowSums(dplyr::across(c(other_emergency_admissions,emergency_admissions_via_a_e_other_a_e_department)),na.rm=T),
+    remergency_breaches_type_1 = rowSums(dplyr::across(c(attendances_over_4hrs_type_1,number_of_attendances_over_4hrs_type_1)),na.rm=T),
+    remergency_breaches_type_2 = rowSums(dplyr::across(c(attendances_over_4hrs_type_2,number_of_attendances_over_4hrs_type_2)),na.rm=T),
+    remergency_breaches_type_3 = rowSums(dplyr::across(c(attendances_over_4hrs_other_department,number_of_attendances_over_4hrs_other_a_e_department)),na.rm=T),
     date = lubridate::my(substr(x=period,start=8,stop=nchar(period))),
     code = org_code) %>%
-  dplyr::select(date,code,starts_with('remergency_'))
+  dplyr::select(date,code,dplyr::starts_with('remergency_'))
   
 #Use this for the pre-2015 data
 ae_data_pre15 <- lapply(ae_files_pre15,
                   function(x){
                     data <- ReadExcel(files = x, sheets = 1)
                   }) %>% 
-  flatten()
+  purrr::flatten()
 
 ae_data_pre15a <- lapply(ae_data_pre15,
                         function(x){
@@ -65,18 +65,18 @@ FINAL_ae_data_pre15 <- ae_data_pre15a %>%
     remergency_admissions_type_3 = emergency_admissions_via_type_3_and_4_a_e,
     date = lubridate::dmy(substr(date,nchar(date)-11,nchar(date)))
   ) %>%
-  select(date,code,contains(c('remergency'))) %>%
-  mutate(date = lubridate::make_date(year=lubridate::year(date),month=lubridate::month(date),day=1L)) %>%
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  group_by(date,code) %>%
-  summarise(across(starts_with('remergency'), sum, .names = "{.col}"))
+  dplyr::select(date,code,contains(c('remergency'))) %>%
+  dplyr::mutate(date = lubridate::make_date(year=lubridate::year(date),month=lubridate::month(date),day=1L)) %>%
+  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::group_by(date,code) %>%
+  dplyr::summarise(dplyr::across(dplyr::starts_with('remergency'), sum, .names = "{.col}"))
 
 #Use this for the 2015 to 2017 data
 ae_data_15to17a <- lapply(ae_files_15to17,
                           function(x){
                             data <- ReadExcel(files=x,sheets=1)
                           }) %>%
-  flatten()
+  purrr::flatten()
 
 ae_data_15to17 <- lapply(ae_data_15to17a,
                          function(x){
@@ -105,21 +105,21 @@ FINAL_ae_data_15to17 <- ae_data_15to17 %>%
       TRUE ~ lubridate::my(date)
     )
   ) %>%
-  select(date,code,contains(c('remergency'))) %>%
-  mutate(date = lubridate::make_date(year=lubridate::year(date),month=lubridate::month(date),day=1L)) %>%
-  group_by(date,code) %>%
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  summarise(across(starts_with('remergency'), sum, .names = "{.col}"))
+  dplyr::select(date,code,dplyr::contains(c('remergency'))) %>%
+  dplyr::mutate(date = lubridate::make_date(year=lubridate::year(date),month=lubridate::month(date),day=1L)) %>%
+  dplyr::group_by(date,code) %>%
+  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::summarise(dplyr::across(dplyr::starts_with('remergency'), sum, .names = "{.col}"))
 
 FINAL_ae_data <- rbind(FINAL_ae_data_15to17,FINAL_ae_data_pre15,FINAL_ae_data_post17) %>%
   drop_na()%>%
-  mutate(period_year=year(date),
-         period_month = month(date)) %>%
-  select(!date)%>%
-  ungroup()%>%
-  mutate_all(~replace(., is.na(.), 0)) %>%
-  group_by(period_year,period_month,code) %>%
-  summarise(across(starts_with('remergency'), sum, .names = "{.col}")) %>%
-  mutate(date = make_date(year=period_year,month=period_month,day=1L),
+  dplyr::mutate(period_year=lubridate::year(date),
+         period_month = lubridate::month(date)) %>%
+  dplyr::select(!date)%>%
+  dplyr::ungroup()%>%
+  dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
+  dplyr::group_by(period_year,period_month,code) %>%
+  dplyr::summarise(dplyr::across(dplyr::starts_with('remergency'), sum, .names = "{.col}")) %>%
+  dplyr::mutate(date = make_date(year=period_year,month=period_month,day=1L),
          org_code = code)
        
