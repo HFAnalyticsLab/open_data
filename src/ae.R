@@ -112,7 +112,7 @@ FINAL_ae_data_15to17 <- ae_data_15to17 %>%
   dplyr::summarise(dplyr::across(dplyr::starts_with('remergency'), sum, .names = "{.col}"))
 
 FINAL_ae_data <- rbind(FINAL_ae_data_15to17,FINAL_ae_data_pre15,FINAL_ae_data_post17) %>%
-  drop_na()%>%
+  tidyr::drop_na()%>%
   dplyr::mutate(period_year=lubridate::year(date),
          period_month = lubridate::month(date)) %>%
   dplyr::select(!date)%>%
@@ -120,6 +120,6 @@ FINAL_ae_data <- rbind(FINAL_ae_data_15to17,FINAL_ae_data_pre15,FINAL_ae_data_po
   dplyr::mutate_all(~replace(., is.na(.), 0)) %>%
   dplyr::group_by(period_year,period_month,code) %>%
   dplyr::summarise(dplyr::across(dplyr::starts_with('remergency'), sum, .names = "{.col}")) %>%
-  dplyr::mutate(date = make_date(year=period_year,month=period_month,day=1L),
-         org_code = code)
+  dplyr::mutate(date = lubridate::make_date(year=period_year,month=period_month,day=1L)) %>%
+  rename(trust_code = 'code')
        
