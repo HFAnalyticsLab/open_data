@@ -20,13 +20,21 @@ GetLinks <- function(url_name,string){
 }
 
 #Read all csvs from urls; unz for zips
-UnzipCSV <- function(files){
+UnzipCSV <- function(files,zip_grep){
+  
+  if(missing(zip_grep) == T){
+    zip_grep <- ''
+  } else {
+    zip_grep
+  }
+  
   #creates temp file to read in the data
   temp <- tempfile()
   download.file(files,temp,extdir=tempdir())
   #This is needed because a zip file may have multiple files
   file_names <- unzip(temp,list=T)$Name
   files_names <- file_names[grepl('.csv',file_names)]
+  file_names <- file_names[grepl(pattern=zip_grep,x=file_names)]
   data <- lapply(file_names,
                 function(x){
                   dirty_data <- unzip(temp,x,exdir=tempdir())
