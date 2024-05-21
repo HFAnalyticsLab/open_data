@@ -1,6 +1,14 @@
 #urls
 pesa_url <- 'https://www.gov.uk/government/collections/public-expenditure-statistical-analyses-pesa'
 tac_url <- 'https://www.england.nhs.uk/financial-accounting-and-reporting/nhs-providers-tac-data-publications/'
+
+tac_17_url <- c('https://webarchive.nationalarchives.gov.uk/ukgwa/20200327163023mp_/https://improvement.nhs.uk/documents/3302/All_TAC_data_published_in_NHS_trusts_accounts_for_2017-18.xlsx',
+                'https://webarchive.nationalarchives.gov.uk/ukgwa/20200327163023mp_/https://improvement.nhs.uk/documents/3142/All_TAC_data_published_in_NHS_foundation_trusts_accounts_for_2017-18.xlsx')
+tac_18_url <- c('https://webarchive.nationalarchives.gov.uk/ukgwa/20200327162132mp_/https://improvement.nhs.uk/documents/5905/TAC_data_published_in_NHS_trusts_accounts_for_2018-19.xlsx',
+                'https://webarchive.nationalarchives.gov.uk/ukgwa/20200327162132mp_/https://improvement.nhs.uk/documents/5906/TAC_data_published_in_NHS_foundation_trusts_accounts_for_2018-19.xlsx')
+
+tac_old_url <- 'https://www.gov.uk/government/collections/foundation-trust-consolidation-ftc-accounts-data'
+
 rtt_url <- 'https://www.england.nhs.uk/statistics/statistical-work-areas/rtt-waiting-times/'
 #For whatever reason, they decided to bundle together multiple months in the same sheets,
 #But unhelpfully, they did not do this in a predictable manner. So each .zip would have
