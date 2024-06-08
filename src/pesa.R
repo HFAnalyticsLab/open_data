@@ -61,7 +61,8 @@ all_pesa_data2 <- lapply(all_pesa_data,
 FINAL_pesa_capital <- all_pesa_data2 %>% 
   flatten() %>%
   data.table::rbindlist(fill=T,idcol=TRUE) %>%
-  mutate(date = str_extract(pattern='(200[0-9]|20[12][0-9]|2030)',date)) %>%
+  mutate(date = str_extract(pattern='(200[0-9]|20[12][0-9]|2030)',date),
+         new_period = str_extract(pattern='(200[0-9]|20[12][0-9]|2030)',period)) %>%
   filter(grepl('Capital budget',.id) == TRUE | 
            grepl('Resource DEL',.id) == TRUE) %>%
   filter(grepl('real terms',.id) == FALSE) %>%
@@ -82,3 +83,12 @@ FINAL_pesa_capital <- all_pesa_data2 %>%
   ungroup()%>%
   group_by(period,planned_outrun,measure) %>%
   summarise(values = mean(values,na.rm=T))
+
+test <- all_pesa_data2 %>% 
+  flatten() %>%
+  data.table::rbindlist(fill=T,idcol=TRUE) %>%
+  mutate(date = str_extract(pattern='(200[0-9]|20[12][0-9]|2030)',date),
+         new_period = str_extract(pattern='(200[0-9]|20[12][0-9]|2030)',period))  %>% 
+  filter(grepl(pattern = 'Total Departmental Expenditure Limits',.id)==T) %>%
+  group_by(new_period,type) %>%
+  summarise(values = sum(as.numeric(values,na.rm=T)))
