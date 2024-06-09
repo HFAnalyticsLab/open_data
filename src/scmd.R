@@ -2,27 +2,25 @@ library(httr)
 library(jsonlite)
 library(tidyverse)
 
-base <- 'https://opendata.nhsbsa.net/api/3/action/datastore_search_sql?resource_id=SCMD_FINAL_2'
-'https://opendata.nhsbsa.net/api/3/action/package_show?id=dataset_name_or_id'
-url <- paste0(base,'01904&sql=SELECT * from `SCMD_FINAL_201904` limit 5')
+base <- 'https://opendata.nhsbsa.net/api/3/action/'
+datastore <- 'datastore_search_sql?resource_id='
+GetQuery <- function(dataset) {
+  paste0("SELECT SUM(TOTAL_QUANITY_IN_VMP_UNIT) AS quantity, AVG(INDICATIVE_COST) as cost, VMP_SNOMED_CODE, VMP_PRODUCT_NAME, YEAR_MONTH FROM `",dataset,"` GROUP BY YEAR_MONTH, VMP_SNOMED_CODE, VMP_PRODUCT_NAME")
+}
 
-page <- GET(url)
-status_code(page)
+list_of_names <- jsonlite::fromJSON(('https://opendata.nhsbsa.net/api/3/action/package_show?id=secondary-care-medicines-data-indicative-price'))
+datasets <- list_of_names[["result"]][["resources"]][["bq_table_name"]]
 
-# Download the JSON data and convert to an R list
-dz2011_list <- fromJSON(url)
-# Extract the actual data from the list
-dz2011 <- dz2011_list$result$records
-glimpse(dz2011, width = 50)
-# Observations: 100
-# Variables: 97
-# $ `_id`     <int> 178, 179, 180, 181, 182, 18...
-# $ Year      <int> 2011, 2011, 2011, 2011, 201...
-# $ DZ2011    <chr> "S01006593", "S01006594", "...
-# $ DZ2011QF  <chr> " ", " ", " ", " ", " ", " ...
-# $ Sex       <chr> "Female", "Male", "Female",...
-# $ AllAges   <int> 325, 252, 296, 478, 454, 36...
-# $ Age0      <int> 2, 2, 6, 8, 2, 4, 4, 3, 1, ...
-# $ Age1      <int> 4, 4, 0, 3, 4, 2, 6, 1, 3, ...
-# $ Age2      <int> 2, 2, 3, 1, 4, 4, 4, 1, 2, ...
-# $ Age3      <int> 6, 1, 0, 5, 1, 4, 4, 2, 1, ...
+data<-lapply(
+  datasets,
+  function(x){
+    resource_id <- paste0(x,'&sql=')
+    query <- GetQuery(x)
+    url <- URLencode(paste0(base,datastore,resource_id,query))
+    data <- jsonlite::fromJSON(url)
+    return(data[["result"]][["result"]][["records"]])
+  }
+)
+
+scmd_data <- data %>%
+  data.table::rbindlist()
