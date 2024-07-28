@@ -5,7 +5,7 @@ library(tidyverse)
 base <- 'https://opendata.nhsbsa.net/api/3/action/'
 datastore <- 'datastore_search_sql?resource_id='
 GetQuery <- function(dataset) {
-  paste0("SELECT SUM(TOTAL_QUANITY_IN_VMP_UNIT) AS quantity, AVG(INDICATIVE_COST) as cost, VMP_SNOMED_CODE, VMP_PRODUCT_NAME, YEAR_MONTH FROM `",dataset,"` GROUP BY YEAR_MONTH, VMP_SNOMED_CODE, VMP_PRODUCT_NAME")
+  paste0("SELECT SUM(TOTAL_QUANITY_IN_VMP_UNIT) AS quantity, SUM(INDICATIVE_COST) as cost, VMP_SNOMED_CODE, VMP_PRODUCT_NAME, YEAR_MONTH FROM `",dataset,"` GROUP BY YEAR_MONTH, VMP_SNOMED_CODE, VMP_PRODUCT_NAME")
 }
 
 list_of_names <- jsonlite::fromJSON(('https://opendata.nhsbsa.net/api/3/action/package_show?id=secondary-care-medicines-data-indicative-price'))
@@ -24,3 +24,9 @@ data<-lapply(
 
 scmd_data <- data %>%
   data.table::rbindlist()
+
+growth_rates <- scmd_data %>%
+  group_by(YEAR_MONTH) %>%
+  summarise(cost=sum(cost,na.rm=T),
+            quantity = sum(quantity,na.rm=T)) %>%
+  mutate(avg_cost = cost/quantity)

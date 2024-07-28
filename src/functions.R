@@ -14,7 +14,7 @@ GetLinks <- function(url_name,string){
     pg <- rvest::read_html(url_name[i])
     pg<-(rvest::html_attr(rvest::html_nodes(pg, "a"), "href"))
     files <- c(files,pg[grepl(string,pg,ignore.case = T)])
-    files <- files %>% unique()
+    files <- unique(files)
   }
   return(files)
 }
@@ -63,6 +63,16 @@ ReadExcelSheets <- function(filename, sheet_names, tibble = T) {
   return(x)
 }
 
+#Download and read excel
+ReadExcel <- function(files,sheets){
+  #creates temp file to read in the data
+  temp <- tempfile()
+  download.file(files,temp)
+  data <- ReadExcelSheets(filename = temp, sheet_names = sheets)
+  #unlink the temp file, important to do
+  unlink(temp)
+  data}
+
 ReadODSSheets <- function(filename, tibble = T) {
   sheets <- readODS::list_ods_sheets(filename)
   x <- lapply(sheets, function(X) readODS::read_ods(filename, sheet = X))
@@ -70,16 +80,6 @@ ReadODSSheets <- function(filename, tibble = T) {
   names(x) <- sheets
   return(x)
 }
-
-#Download and read excel
-ReadExcel <- function(files,sheets){
-  #creates temp file to read in the data
-  temp <- tempfile()
-  download.file(files,temp)
-  data <- ReadExcelSheets(filename = temp,sheet_names = sheets)
-  #unlink the temp file, important to do
-  unlink(temp)
-  data}
 
 #Download and read excel
 ReadODS <- function(files){
